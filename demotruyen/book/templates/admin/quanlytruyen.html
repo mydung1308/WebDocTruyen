@@ -1,0 +1,142 @@
+{% extends 'admin/home.html' %}
+
+{% block content %}
+
+<a href="{% url 'dang_ky_truyen' %}" class="btn btn-danger ms-5" style="margin-top:70px; font-weight:bold"><i class="fas fa-file-upload    "></i> Thêm truyện</a>
+<a href="{% url 'admin-timkiemtruyen' %}" class="btn btn-warning ms-5" style="margin-top:70px; font-weight:bold">🔍 Tim kiếm thống kê</a>
+
+
+<div class="container ">
+    <h2 class="mb-4 text-center">📚 Tổng số truyện: <strong>{{ truyen }}</strong></h2>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark text-white">
+                <tr>
+                    <th>STT</th>
+                    <th>Tên truyện</th>
+                    <th>Trạng thái</th>
+                    <th>Ảnh đại diện</th>
+                    <th>Tác giả</th>
+                    <th>Thể loại</th>
+                    <th>Tổng số chương</th>
+                    <th>Chỉnh sửa</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for truyen in truyen_page %}
+                <tr>
+                    <td>{{ forloop.counter0|add:truyen_page.start_index }}</td>
+                    <td>
+                        <a href="{% url 'admin-chitiettruyen' truyen.id %}" class="text-decoration-none text-dark fw-semibold">
+                        {{ truyen.ten_truyen }}
+                        </a>
+                    </td>
+                    <td>
+                        <span class="badge bg-{% if truyen.trang_thai == 'dang_ra' %}primary{% elif truyen.trang_thai == 'hoan_thanh' %}success{% else %}warning{% endif %}">
+                            {{ truyen.get_trang_thai_display }}
+                        </span>
+                    </td>
+                    <td >
+                        {% if truyen.anh_dai_dien %}
+                            <img src="{{ truyen.anh_dai_dien.url }}" alt="Ảnh đại diện" width="50 ">
+                        {% else %}
+                            <span class="text-muted">Chưa có ảnh</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ truyen.id_tac_gia.ten_tac_gia }}</td>
+                    <td style="font-size:18px">
+                        {% with truyen.the_loai_cua_truyen.all as theloais %}
+                        {% if theloais %}
+                            {% for theloai_truyen in theloais %}
+                            <a href="{% url 'admin-theloai' theloai_truyen.id_the_loai.id %}" class="badge bg-info text-decoration-none" >{{ theloai_truyen.id_the_loai.ten_the_loai }}</a>{% if not forloop.last %} {% endif %}
+                  
+                                
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-muted">Chưa có thể loại</span>
+                        {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td>{{ truyen.so_luong_chuong }}</td>
+                    <td>
+                        <a href="{% url 'suatruyen' truyen.id %}" class="btn btn-outline-primary btn-sm mb-1">✏️ Sửa</a>
+                        
+                        <!-- Nút Xóa mở Modal -->
+                    <button type="button" class="btn btn-outline-danger btn-sm mb-1" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ truyen.id }}">
+                        🗑️
+                       </button>
+   
+           <!-- Modal xác nhận xóa -->
+       <div class="modal fade" id="confirmDeleteModal{{ truyen.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+           <div class="modal-dialog">
+               <div class="modal-content">
+                   <div class="modal-header">
+                       <h5 class="modal-title" id="exampleModalLabel">Xác nhận xóa</h5>
+                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                   </div>
+                   <div class="modal-body">
+                       Bạn có chắc chắn muốn truyện <strong>{{ truyen.ten_truyen }}</strong> không?
+                   </div>
+                       <div class="modal-footer">
+                           <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Hủy</button>
+                               <form method="POST" action="{% url 'xoatruyen' truyen.id %}">
+                               {% csrf_token %}
+                               <button type="submit" class="btn btn-secondary">Xác nhận xóa</button>
+                               </form>
+                       </div>
+               </div>
+           </div>
+       </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">Chưa có truyện nào.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <nav aria-label="Pagination">
+        <ul class="pagination justify-content-center">
+            {% if truyen_page.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">Đầu</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ truyen_page.previous_page_number }}">&laquo;</a>
+                </li>
+            {% endif %}
+    
+            {% for num in truyen_page.paginator.page_range %}
+                {% if truyen_page.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > truyen_page.number|add:"-3" and num < truyen_page.number|add:"3" %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+    
+            {% if truyen_page.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ truyen_page.next_page_number }}">&raquo;</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ truyen_page.paginator.num_pages }}">Cuối</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    <!--
+    Tổng số trang: {{ truyen_page.paginator.num_pages }} <br>
+    Trang hiện tại: {{truyen_page.number }} <br>
+    Có trang trước? {{ truyen_page.has_previous }} <br>
+    Có trang sau? {{ truyen_page.has_next }} <br>
+-->
+</div>
+    
+
+
+{% endblock %}

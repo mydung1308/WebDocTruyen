@@ -1,0 +1,237 @@
+<div class="mt-3 ms-{{ margin|default:4 }} p-2 border rounded bg-white">
+    {% if binhluan.user.thong_tin_nguoi_dung.anh_dai_dien %}
+        <img src="{{ binhluan.user.thong_tin_nguoi_dung.anh_dai_dien.url }}" class="img-fluid rounded-circle" width="50">
+    {% else %}
+        <img src="/static/images/default-avatar.png" class="img-fluid rounded-circle" width="40">
+    {% endif %}
+
+    <strong>{{ binhluan.user.username }}</strong>
+
+    <small class="text-muted"> - {{ binhluan.thoigian_danhgia|date:"d/m/Y H:i" }}
+         {% if binhluan.capnhat %}
+        <span class="text-muted">- </span>
+        <span class="text-muted">Cập nhật: </span>
+        <span class="text-muted">{{ binhluan.capnhat|date:"d/m/Y H:i" }}</span>
+        {% else %}
+        <span class="text-muted">- Chưa cập nhật</span>
+        {% endif %}
+        <!--
+        <em>(Đã chỉnh sửa: {{ binhluan.capnhat|date:"d/m/Y H:i" }})</em> -->
+    
+    </small> 
+    
+<!--
+    <p class="mt-2">{{ binhluan.binhluan }}</p>-->
+<!--
+    <p class="mt-2">
+    {% if not binhluan.binhluan %}
+        <em class="text-muted">[Bình luận đã bị xóa]</em>
+    {% else %}
+        {{ binhluan.binhluan }}
+    {% endif %}
+    </p>
+-->
+
+    <p class="mt-2">
+    {% if not binhluan.binhluan %}
+        <em class="text-muted">[Bình luận đã bị xóa]</em>
+    {% elif binhluan.binhluan|length > 20 %}
+        <span id="short-{{ binhluan.id }}">{{ binhluan.binhluan|truncatechars:20 }}</span>
+        <span id="full-{{ binhluan.id }}" style="display: none;">{{ binhluan.binhluan }}</span>
+        <a href="#" onclick="toggleComment({{ binhluan.id }}); return false;" id="toggle-link-{{ binhluan.id }}">Xem thêm</a>
+    {% else %}
+        {{ binhluan.binhluan }}
+    {% endif %}
+</p>
+
+
+
+
+    <small class="d-flex gap-3">
+
+    <a href="#" onclick="toggleReplyForm({{ binhluan.id }}); return false;" class="me-5">
+        <i class="bi bi-reply"></i> Trả lời
+    </a>
+
+    {% if user == binhluan.user %}
+        <a href="#" onclick="toggleEditForm({{ binhluan.id }}); return false;" class="me-5">
+            <i class="bi bi-pencil-square"></i> Chỉnh sửa
+        </a>
+    {% endif %}
+
+    {% if user == binhluan.user and binhluan.binhluan %}
+    <a href="{% url 'xoa-binh-luan' binhluan.id %}" onclick="return confirm('Bạn có chắc muốn xóa bình luận này không?');">
+        <i class="bi bi-trash"></i> Xóa
+    </a>
+    {% endif %}
+
+
+    
+
+    
+    </small>
+
+    <form id="edit-form-{{ binhluan.id }}" action="{% url 'sua-binh-luan' binhluan.id %}" method="POST" style="display: none;" class="mt-2" required>
+    {% csrf_token %}
+    <textarea name="noi_dung_moi" class="form-control" rows="2">{{ binhluan.binhluan }}</textarea>
+    <button type="submit" class="btn btn-sm btn-success mt-1">Lưu</button>
+    </form>
+
+
+    <form id="reply-form-{{ binhluan.id }}" action="{% url 'reply-danhgia' binhluan.id_truyen.id %}" method="POST" style="display: none;" class="mt-2">
+    {% csrf_token %}
+    <input type="hidden" name="parent_id" value="{{ binhluan.id }}">
+    <textarea name="binhluan" class="form-control" rows="2" placeholder="Trả lời..." required></textarea>
+    <button type="submit" class="btn btn-sm btn-primary mt-1">Gửi</button>
+    </form>
+
+    <!--
+    <form id="reply-form-{{ binhluan.id }}" action="{% url 'reply-danhgia' binhluan.id %}" method="POST" style="display: none;" class="mt-2" required>
+    {% csrf_token %}
+    <textarea name="noi_dung_tra_loi" class="form-control" rows="2" placeholder="Trả lời..."></textarea>
+    <button type="submit" class="btn btn-sm btn-primary mt-1">Gửi</button>
+    </form>
+-->
+
+    <!--
+
+    {% if user.is_authenticated %}
+        <a href="#" onclick="document.getElementById('reply-form-{{ binhluan.id }}').style.display='block'; return false;"><i class="fa fa-reply" aria-hidden="true"></i> Trả lời</a>
+        <div id="reply-form-{{ binhluan.id }}" style="display: none;" class="mt-2">
+            <form method="POST" action="{% url 'reply-danhgia' truyen.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="parent_id" value="{{ binhluan.id }}">
+                <textarea name="binhluan" class="form-control" rows="2" placeholder="Trả lời bình luận..." required></textarea>
+                <button type="submit" class="btn btn-sm btn-primary mt-1">Gửi trả lời</button>
+            </form>
+        </div>
+    {% endif %}
+    -->
+
+   {% with binhluan.phan_hoi.all as replies %}
+    {% if replies %}
+        <div id="reply-list-{{ binhluan.id }}">
+            {% for reply in replies|slice:":2" %}
+                {% include "reader/binhluan_item.html" with binhluan=reply user=user margin=margin|add:4 %}
+            {% endfor %}
+        </div>
+
+        {% if replies|length > 2 %}
+            <div id="hidden-replies-{{ binhluan.id }}" style="display: none;">
+                {% for reply in replies|slice:"2:" %}
+                    {% include "reader/binhluan_item.html" with binhluan=reply user=user margin=margin|add:4 %}
+                {% endfor %}
+            </div>
+
+            <a href="#" class="text-primary d-block mt-2"
+               onclick="toggleReplies({{ binhluan.id }}); return false;"
+               id="toggle-replies-btn-{{ binhluan.id }}"> 
+                Xem thêm {{ replies|length|add:"-2" }} phản hồi…
+            </a>
+        {% endif %}
+    {% endif %}
+{% endwith %}
+
+
+
+    <!--Giả sử bạn có bình luận gốc A, và A có một phản hồi là B.
+
+Trong template, khi render A, nó sẽ duyệt phan_hoi.all và tìm thấy B.
+
+Với mỗi phản hồi (B), nó lại:
+
+django
+Sao chép
+Chỉnh sửa
+
+→ tức là render lại chính template này, nhưng với binhluan = B.
+
+Nếu B cũng có phản hồi C, thì quá trình này tiếp tục: template lại được gọi với binhluan = C.
+
+Và cứ thế, mỗi phản hồi có thể có phản hồi con, và mỗi lần đều "gọi lại chính mình" để hiển thị.-->
+</div>
+
+<script>
+function toggleComment(id) {
+    const shortText = document.getElementById('short-' + id);
+    const fullText = document.getElementById('full-' + id);
+    const link = document.getElementById('toggle-link-' + id);
+
+    const isShortHidden = shortText.style.display === 'none';
+    shortText.style.display = isShortHidden ? 'inline' : 'none';
+    fullText.style.display = isShortHidden ? 'none' : 'inline';
+    link.innerText = isShortHidden ? 'Xem thêm' : 'Thu gọn';
+}
+</script>
+
+<script>
+function toggleReplies(commentId) {
+    const hidden = document.getElementById('hidden-replies-' + commentId);
+    const btn = document.getElementById('toggle-replies-btn-' + commentId);
+
+    if (!hidden) return; 
+
+    if (hidden.style.display === 'none') {
+        hidden.style.display = 'block';
+        btn.textContent = 'Ẩn bớt phản hồi';
+    } else {
+        hidden.style.display = 'none';
+        const count = hidden.children.length;
+        btn.textContent = `Xem thêm ${count} phản hồi…`;
+    }
+}
+</script>
+
+
+
+
+<!--
+{% if user == binhluan.user %}
+    <a href="#" onclick="toggleEditForm({{ binhluan.id }}); return false;">
+        <i class="bi bi-pencil-square"></i> Chỉnh sửa
+    </a>
+
+    <form id="edit-form-{{ binhluan.id }}" action="{% url 'sua-binh-luan' binhluan.id %}" method="POST" style="display: none;" class="mt-2">
+        {% csrf_token %}
+        <textarea name="noi_dung_moi" class="form-control" rows="2">{{ binhluan.binhluan }}</textarea>
+        <button type="submit" class="btn btn-sm btn-success mt-1">Lưu</button>
+    </form>
+{% endif %}
+-->
+
+                                   
+<!--
+TRƯỜNG HỢP HIỂN THỊ 2 PHẢN HỒI BỊ ẨN CHO ĐẾN HẾT TẤT CẢ PHẢN HỒI 
+<script>
+function toggleEditForm(id) {
+    const form = document.getElementById('edit-form-' + id);
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+-->
+
+<!--
+let repliesShown = 2; // Số lượng phản hồi đã hiển thị
+
+function toggleReplies(id) {
+    const hiddenReplies = document.getElementById('hidden-replies-' + id);
+    const replies = hiddenReplies.children; // Lấy tất cả các phản hồi ẩn
+    const totalReplies = replies.length; // Tổng số phản hồi ẩn
+    const btn = document.getElementById('toggle-replies-btn-' + id); // Lấy nút "Xem thêm"
+
+    // Hiển thị thêm 2 phản hồi mỗi lần nhấp
+    for (let i = repliesShown; i < repliesShown + 2 && i < totalReplies; i++) {
+        replies[i].style.display = 'block'; // Hiển thị phản hồi
+    }
+
+    repliesShown += 2; // Tăng số lượng phản hồi đã hiển thị
+
+    // Cập nhật văn bản của nút
+    if (repliesShown < totalReplies) {
+        btn.textContent = `Xem thêm ${totalReplies - repliesShown} phản hồi…`;
+    } else {
+        btn.style.display = 'none'; // Ẩn nút nếu đã hiển thị tất cả các phản hồi
+    }
+}
+
+-->

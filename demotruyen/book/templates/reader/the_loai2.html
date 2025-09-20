@@ -1,0 +1,55 @@
+{% extends 'reader/home.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">📚 DANH SÁCH TRUYỆN</h2>
+    
+    <div class="row">
+        {% for truyen in page_obj %}
+        
+        <div class="col-6 col-md-4 col-lg-3 mb-4" >
+             <!-- Bọc toàn bộ card trong thẻ <a> -->
+            <a href="{% url 'reader-chitiettruyen' truyen.id %}" class="text-decoration-none">
+            
+             <!-- Điều chỉnh số cột theo kích thước màn hình -->
+            <div class="card truyen-card h-100">
+                
+                <div class="position-relative">
+                    
+                    <img src="{{ truyen.anh_dai_dien.url }}" class="truyen-img card-img-top" alt="{{ truyen.ten_truyen }}">
+                    
+                    {% if truyen.trang_thai == 'Full' %}
+                    <span class="badge bg-danger position-absolute top-0 end-0">FULL</span>
+                    {% endif %}
+                </div>
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <h6 class="card-title text-truncate">{{ truyen.ten_truyen }}</h6>
+                    <p class="text-muted mt-3 mb-1 small">📖 Chương: {{ truyen.so_luong_chuong }}</p>
+                    <p class="text-muted small">📅 Cập nhật: {{ truyen.ngay_cap_nhat|date:"d/m/Y" }}</p>
+                </div>
+            </div>
+            </a>
+        </div>
+        {% empty %}
+        <p>Không có truyện nào.</p>
+        {% endfor %}
+    </div>
+
+</div>
+
+
+
+
+<style>
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .page-item {
+        margin: 0 5px;
+    }
+</style>    
+
+{% endblock %}

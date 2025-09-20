@@ -1,0 +1,98 @@
+{% extends 'admin/home.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4" style="margin-top:100px"> 📚  DANH SÁCH TRUYỆN</h2>
+    
+    <div class="row">
+        {% for truyen in page_obj %}
+        
+        <div class="col-6 col-md-4 col-lg-3 mb-4" >
+             <!-- Bọc toàn bộ card trong thẻ <a> -->
+            <a href="{% url 'admin-chitiettruyen' truyen.id %}" class="text-decoration-none">
+            
+             <!-- Điều chỉnh số cột theo kích thước màn hình -->
+            <div class="card truyen-card h-100">
+                
+                <div class="position-relative">
+                    
+                    <img src="{{ truyen.anh_dai_dien.url }}" class="truyen-img card-img-top" alt="{{ truyen.ten_truyen }}">
+                    
+                    {% if truyen.trang_thai == 'Full' %}
+                    <span class="badge bg-danger position-absolute top-0 end-0">FULL</span>
+                    {% endif %}
+                </div>
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <h6 class="card-title text-truncate">{{ truyen.ten_truyen }}</h6>
+                    <p class="text-muted mt-3 mb-1 small">📖 Chương: {{ truyen.so_luong_chuong }}</p>
+                    <p class="text-muted small">📅 Cập nhật: {{ truyen.ngay_cap_nhat|date:"d/m/Y" }}</p>
+                </div>
+            </div>
+            </a>
+        </div>
+        {% empty %}
+        <p>Không có truyện nào.</p>
+        {% endfor %}
+    </div>
+
+    
+
+</div>
+<!-- Phân trang -->
+
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1" aria-label="Trang đầu">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Trang trước">
+                    <span aria-hidden="true">‹</span>
+                </a>
+            </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Trang sau">
+                    <span aria-hidden="true">›</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Trang cuối">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+
+
+
+<style>
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .page-item {
+        margin: 0 5px;
+    }
+</style>    
+{% endblock %}

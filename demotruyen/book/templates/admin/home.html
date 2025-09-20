@@ -1,0 +1,217 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link rel="stylesheet" href="{% static 'bootstrap-5.3.5-dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    
+    
+    
+    <style>
+      .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: bold;
+        
+      }
+      .navbar-nav .nav-link {
+        font-size: 1.2rem;
+      }
+      /* Hiệu ứng trueyn moi cap nhat */
+        .card.truyen-card {
+            height: 100%; /* Giữ chiều cao đồng nhất */
+            display: flex;
+            flex-direction: column;
+        }
+        .truyen-card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
+          }
+          .truyen-card:hover {
+            transform: scale(1.05);
+          }
+          .truyen-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+          }
+          .pagination .page-item.active .page-link {
+            background-color: #007bff;
+            border-color: #007bff;
+          }
+          
+          .card.truyen-card .card-body {
+            flex-grow: 1; /* Tự động co giãn */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+          }
+          
+          .card.truyen-card img {
+            height: 280px; /* Đặt chiều cao cố định cho ảnh */
+            object-fit: cover; /* Cắt ảnh để vừa khung */
+          }
+          
+          .card-body .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: left;
+            white-space: normal; /* Cho phép xuống dòng */
+            overflow: hidden;
+            text-overflow: ellipsis; /* Ngăn chữ bị tràn ...... */
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Giới hạn tối đa 2 dòng */
+            -webkit-box-orient: vertical;
+            line-height: 1.4; /* Tăng line-height để chữ không bị cắt */
+            margin-bottom: 3;
+          }
+          .card-body p {
+            font-size: 14px; /* Mặc định cho desktop */
+          }
+    </style>
+  </head>
+  <body>
+    <script src="{% static 'bootstrap-5.3.5-dist/js/bootstrap.bundle.min.js' %}"></script>
+   
+   
+
+    <nav class="navbar navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">🦄💕FunnyStory - ADMIN Page </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+    
+          <div class="offcanvas offcanvas-end text-bg-primary" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+            <div class="offcanvas-header">
+              <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Admin page <i class="fas fa-edit    "></i></h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+              <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="{% url 'admin-home' %}"> Home <i class="fas fa-home    "></i></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'list-user' %}">Quản lý Người dùng </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'qltruyen' %}">Quản lý truyện </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'qltheloai' %}">Quản lý thể loại </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'logout' %}">Đăng xuất </a>
+                </li>
+                <!--
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Dropdown
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-dark">
+                    <li><a class="dropdown-item" href="#">Action</a></li>
+                    <li><a class="dropdown-item" href="#">Another action</a></li>
+                    <li>
+                      <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="#">Something else here</a></li>
+                  </ul>
+                </li>
+              -->
+              </ul>
+              <form class="d-flex mt-3" role="search">
+                <input class="form-control me-2" type="search" placeholder="Nhập nội dung tìm kiếm..." aria-label="Search">
+                <button class="btn btn-warning" type="submit">🔍</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+      {% if messages %}
+      <div class="container mt-3">
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+      </div>
+      {% endif %}
+      {% block content %}
+      <div class="container mt-4" >
+        <h2 class="mb-4" style="margin-top: 100px;">TRUYỆN MỚI CẬP NHẬT</h2>
+        
+        <div class="row">
+            {% for truyen in page_obj %}
+            
+            <div class="col-6 col-md-4 col-lg-3 mb-4" >
+                 <!-- Bọc toàn bộ card trong thẻ <a> -->
+                <a href="{% url 'admin-chitiettruyen' truyen.id %}" class="text-decoration-none">
+                
+                 <!-- Điều chỉnh số cột theo kích thước màn hình -->
+                <div class="card truyen-card h-100">
+                    
+                    <div class="position-relative">
+                        
+                        <img src="{{ truyen.anh_dai_dien.url }}" class="truyen-img card-img-top" alt="{{ truyen.ten_truyen }}">
+                        
+                        {% if truyen.trang_thai == 'Full' %}
+                        <span class="badge bg-danger position-absolute top-0 end-0">FULL</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <h6 class="card-title text-truncate">{{ truyen.ten_truyen }}</h6>
+                        <p class="text-muted mt-3 mb-1 small">📖 Chương: {{ truyen.so_luong_chuong }}</p>
+                        <p class="text-muted small">📅 Cập nhật: {{ truyen.ngay_cap_nhat|date:"d/m/Y" }}</p>
+                    </div>
+                </div>
+                </a>
+            </div>
+            {% empty %}
+            <p>Không có truyện nào.</p>
+            {% endfor %}
+        </div>
+
+    </div>
+           <!-- Phân trang -->
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center">
+              {% if page_obj.has_previous %}
+                  <li class="page-item">
+                      <a class="page-link" href="?page=1">&laquo;</a>
+                  </li>
+                  <li class="page-item">
+                      <a class="page-link" href="?page={{ page_obj.previous_page_number }}">‹</a>
+                  </li>
+              {% endif %}
+  
+              {% for num in page_obj.paginator.page_range %}
+                  {% if page_obj.number == num %}
+                      <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                  {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                      <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                  {% endif %}
+              {% endfor %}
+  
+              {% if page_obj.has_next %}
+                  <li class="page-item">
+                      <a class="page-link" href="?page={{ page_obj.next_page_number }}">›</a>
+                  </li>
+                  <li class="page-item">
+                      <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">&raquo;</a>
+                  </li>
+              {% endif %}
+          </ul>
+      </nav>
+  
+      {% endblock %}
+  </body>
+</html>

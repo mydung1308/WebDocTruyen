@@ -1,0 +1,270 @@
+
+{% extends 'giaodienchung/index.html' %}
+
+{% block content %}
+
+
+        <style>
+            
+            @media (max-width: 768px) { 
+                .button-group .btn {
+                    margin-bottom: 5px; /* Thêm khoảng cách nhỏ giữa các nút */
+                }
+                .col-md-3{
+                    margin-bottom: 30px;
+                }
+                
+            }
+            
+
+            .dark-mode .breadcrumb-item {
+                color: #fff !important; /* Đổi màu chữ sang trắng */
+            }
+            
+               
+        </style>    
+    
+        <div class="container mt-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ truyen.ten_truyen }}</li>
+                </ol>
+            </nav>
+        
+            <div class="card p-4 shadow-sm bg-white">
+                <div class="row">
+                    <div class="col-md-3 ">
+                        <img src="{{ truyen.anh_dai_dien.url }}" class="img-fluid rounded shadow" alt="{{ truyen.ten_truyen }}" style="width: 100%;" >
+                    </div>
+                    <div class="col-md-9">
+                        <h2 class="fw-bold">{{ truyen.ten_truyen }}</h2>
+                        <p><strong>Cập nhật:</strong> {{ truyen.ngay_cap_nhat|date:"d/m/Y" }}</p>
+                        <p><strong>Loại:</strong> <span class="badge bg-primary">Truyện Chữ</span></p>
+                        <p><strong>Tác giả:</strong> {{ truyen.id_tac_gia.ten_tac_gia }}</p>
+                        <p><strong>Thể loại:</strong>
+                            
+                            {% for the_loai in the_loai_cua_truyen %}
+                            <a href="{% url 'the_loai' the_loai.id %}" class="badge bg-info text-decoration-none" >{{ the_loai.ten_the_loai }}</a>{% if not forloop.last %} {% endif %}
+                          
+                            <!--<span class="badge bg-info">{{ the_loai.ten_the_loai }}</span>{% if not forloop.last %} {% endif %} -->
+                            {% endfor %}
+                               
+                        </p>
+                        <p><strong>Lượt xem:</strong> {{ truyen.luot_xem }}</p> <!--CACH 2: {{ truyen.truyen_luot_xem.count }}-->
+                        <p><strong>Yêu thích:</strong> {{ truyen.truyen_luot_thich.count}}</p> <!--LIÊN DATABASE -->
+                        <p><strong>Lượt theo dõi:</strong> {{ truyen.truyen_yeu_thich_list.count }}</p>
+                        <p><strong>Trạng thái:</strong> 
+                            {% if truyen.trang_thai == 'hoan_thanh' %}
+                                <span class="badge bg-success">Hoàn thành</span>
+                            {% else %}
+                                <span class="badge bg-warning">Đang cập nhật</span>
+                            {% endif %}
+                        </p>
+                        
+
+                        <hr>
+                        <!-- Nút hành động -->
+                        <div class="mt-3 button-group">
+                            <button class="btn btn-outline-danger me-3"><i class="bi bi-heart"></i> Yêu thích</button>
+                            <button class="btn btn-danger me-3"><i class="bi bi-cash"></i> Donate</button>
+                            <a href="{% url 'doc_tu_first' truyen.id %}" class="btn btn-warning me-3">
+                                <i class="bi bi-book"></i> Đọc từ đầu
+                              </a>
+                              
+                              <a href="{% url 'doc_tap_new' truyen.id %}" class="btn btn-success me-3">
+                                <i class="bi bi-bookmark-check"></i> Đọc tập mới
+                              </a>
+                            <button class="btn btn-primary me-3"><i class="bi bi-bell"></i> Theo dõi</button>
+                            <button class="btn btn-dark me-3"><i class="bi bi-exclamation-circle"></i> Báo lỗi</button>
+                        </div>
+                        <hr>
+                        <p id="mo-ta" 
+                        data-full="{{ truyen.tom_tat_noi_dung|escape }}" 
+                        data-short="{{ truyen.tom_tat_noi_dung|truncatechars:100|escape }}" 
+                        style="max-height: 50px; overflow: hidden; transition: max-height 0.5s ease-in-out;">
+                        {{ truyen.tom_tat_noi_dung|truncatechars:100 }}
+                     </p>
+                     <p>
+                         <a id="btn-xem-them" href="javascript:void(0);" 
+                            style="color: blue; text-decoration: none; font-weight: bold;">
+                            Xem thêm
+                         </a>
+                     </p>
+                        <div class="mt-5 mb-5">
+                            <!--
+                            <button class="btn btn-primary me-2 text-align-center"><i class="bi bi-list"></i> Danh sách chương</button>
+                            <button class="btn btn-outline-primary position-relative">
+                            <i class="bi bi-chat-dots"></i> Bình luận
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                            </button>
+                            -->
+                            <button id="btn-danh-sach-chuong" class="btn btn-primary me-2 text-align-center"><i class="bi bi-list"></i> Danh sách chương</button>
+                            <button id="btn-binh-luan" type="button" class="btn btn-outline-primary position-relative">
+                                <i class="bi bi-chat-dots"></i> Bình luận
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{tong_binhluan}}</span>
+                            </button>
+        
+                        </div>
+                    
+                </div>
+
+                    <div id="noi-dung-doi" class="mt-4"> 
+                        <!-- Phần bình luận (ẩn mặc định) -->
+                        <div class="mt-4" id="binh-luan-section" style="display: none;">
+                            <h5 class="mt-4"><i class="fas fa-comments    "></i> Đăng nhập để tương tác nhé </h5>
+                                {% for bl in cac_binhluan %}
+                                    {% include "giaodienchung/binhluan_item1.html" with binhluan=bl user=user margin=0 %}
+                                {% empty %}
+                                    <p>Chưa có bình luận nào.</p>
+                                {% endfor %} 
+                        </div>  
+
+
+                        <div class="chapter-list border rounded p-2" id="danh-sach-chuong" style="max-height: 300px; overflow-y: auto;">
+                            <ul class="list-group">
+                            {% for chuong in danh_sach_chuong %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <a href="{% url 'doc_chuong' truyen.id chuong.thu_tu %}" class="text-decoration-none text-dark">
+                                        📖 Chương {{ chuong.thu_tu }}: {{ chuong.ten_chuong }}
+                                    </a>
+                                    <small class="text-muted">{{ chuong.id_truyen.ngay_cap_nhat|date:"d/m/Y" }}</small>
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                        
+            
+                    
+                    </div>
+                
+                 
+            </div>
+                   
+        
+        </div>
+
+
+
+        <div class="container mt-4">
+            <h2 class="mb-4">Truyện Tương tự</h2>
+            
+            <div class="row">
+                {% for truyentt  in truyen_tuong_tu %}
+                
+                <div class="col-6 col-md-4 col-lg-3 mb-4" >
+                     <!-- Bọc toàn bộ card trong thẻ <a> -->
+                    <a href="{% url 'chitiettruyen' truyentt.id %}" class="text-decoration-none">
+                    
+                     <!-- Điều chỉnh số cột theo kích thước màn hình -->
+                    <div class="card truyen-card h-100">
+                        
+                        <div class="position-relative">
+                            
+                            <img src="{{ truyentt.anh_dai_dien.url }}" class="truyen-img card-img-top" alt="{{ truyentt.ten_truyen }}">
+                            
+                            {% if truyentt.trang_thai == 'Full' %}
+                            <span class="badge bg-danger position-absolute top-0 end-0">FULL</span>
+                            {% endif %}
+                        </div>
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <h6 class="card-title text-truncate">{{ truyentt.ten_truyen }}</h6>
+                            <p class="text-muted mt-3 mb-1 small">📖 Chương: {{ truyentt.so_luong_chuong }}</p>
+                            <p class="text-muted small">📅 Cập nhật: {{ truyentt.ngay_cap_nhat|date:"d/m/Y" }}</p>
+                        </div>
+                    </div>
+                    </a>
+                </div>
+                {% empty %}
+                <p>Không có truyện nào.</p>
+                {% endfor %}
+            </div>
+    
+        </div>
+        <!-- Bootstrap 5 + Script Toggle Dark Mode -->
+         
+        
+        <script>
+            
+            document.addEventListener("DOMContentLoaded", function () {
+                let btn = document.getElementById("btn-xem-them");
+                let moTa = document.getElementById("mo-ta");
+                let isExpanded = false; // Trạng thái hiển thị
+            
+                let fullText = moTa.getAttribute("data-full");
+                let shortText = moTa.getAttribute("data-short");
+            
+                btn.addEventListener("click", function () {
+                    if (isExpanded) {
+                        moTa.innerHTML = shortText;
+                        moTa.style.maxHeight = "50px"; // Thu gọn lại
+                        btn.innerText = "Xem thêm";
+                    } else {
+                        moTa.innerHTML = fullText;
+                        moTa.style.maxHeight = "500px"; // Mở rộng
+                        btn.innerText = "Thu gọn";
+                    }
+                    isExpanded = !isExpanded; // Đảo trạng thái
+                });
+            });
+
+           
+        </script>
+
+         <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const btnBinhLuan = document.getElementById('btn-binh-luan');
+                const btnDanhSach = document.getElementById('btn-danh-sach-chuong');
+                const blSection = document.getElementById('binh-luan-section');
+                const dsChuong = document.getElementById('danh-sach-chuong');
+
+               
+        
+                btnBinhLuan.addEventListener('click', function () {
+                    blSection.style.display = 'block'; // mở phần bình luận
+                    dsChuong.style.display = 'none';
+                });
+        
+                btnDanhSach.addEventListener('click', function () {
+                    blSection.style.display = 'none';
+                    dsChuong.style.display = 'block';
+                });
+            });
+        </script>
+
+        
+        <style>
+            .dark-mode .chapter-list {
+                background-color: #181818 !important; /* Nền xám than */
+                color: #ffffff !important; /* Chữ trắng */
+                border-color: #444 !important; /* Viền tối */
+            }
+            
+            .dark-mode .list-group-item {
+                background-color: #222 !important; /* Nền item tối hơn */
+                color: #ffffff !important; /* Chữ trắng */
+                border-color: #444 !important;
+            }
+            
+            .dark-mode .list-group-item a {
+                color: #ffffff !important; /* Chữ trắng */
+                font-weight: 500;
+                text-decoration: none;
+            }
+            
+            .dark-mode .list-group-item a:hover {
+                color: #ffd700 !important; /* Vàng khi hover */
+                text-decoration: underline;
+            }
+            
+            .dark-mode .text-muted {
+                color: #aaaaaa !important; /* Chữ phụ sáng hơn */
+            }
+            
+            
+        </style>
+{% endblock %}
+
+
+
+

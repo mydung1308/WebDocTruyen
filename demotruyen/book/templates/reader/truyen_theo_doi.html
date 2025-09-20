@@ -1,0 +1,242 @@
+{% extends 'reader/home.html' %}
+
+{% block content %}
+
+
+
+<h2 style="font-size: 40px; color: #333; margin-bottom: 20px; margin-left: 20px; ">📚 Chương mới cập nhật</h2>
+
+{% if chuong_moi_theo_truyen %}
+  <div class="border rounded p-3 mb-4 mx-4 bg-light shadow-sm">
+    {% for truyen, cac_chuong in chuong_moi_theo_truyen.items %}
+      <div class="mb-3">
+        <h5 style="color: #2c3e50;">📘 {{ truyen.ten_truyen }}</h5>
+        <ul>
+          {% for chuong in cac_chuong %}
+            <li>
+              <a href="{{ chuong.get_absolute_url }}" style="text-decoration: none;">
+                👉 <strong>{{ chuong.ten_chuong }}</strong>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>Không có chương mới.</p>
+{% endif %}
+
+
+
+<!--
+<h2 style="font-size: 24px; color: #333; margin-bottom: 20px;">📚 Chương mới cập nhật</h2>
+{% if messages %}
+  {% for message in messages %}
+    <p style="color:green">{{ message|safe }}</p>
+  {% endfor %}
+{% endif %}
+<div class="container mt-4">
+  {% if messages %}
+    <div class="border rounded p-3 mb-4 bg-light">
+      {% for message in messages %}
+        <p style="color: green; margin: 0;">{{ message|safe }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="row">
+    
+  </div>
+</div>
+-->
+<style>
+  .section-title {
+    font-size: 26px;
+    color: #2d3748;
+    margin-bottom: 25px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+  }
+
+  .section-title::before {
+    content: "📚";
+    font-size: 30px;
+    margin-right: 10px;
+  }
+
+  .message-container {
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    background: linear-gradient(to right, #e6fffa, #f0fff4);
+    border: 1px solid #38b2ac;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .message-container p {
+    color: #2f855a;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+</style>
+
+{% endblock %}
+<!--
+<h2 class="section-title">Chương mới cập nhật</h2>
+
+{% if messages %}
+  <div class="container mt-4">
+    <div class="message-container">
+      {% for message in messages %}
+        <p>{{ message|safe }}</p>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+
+<div class="container mt-4">
+
+  {% if messages %}
+    <div class="alert alert-success shadow-sm border border-success rounded d-flex align-items-start" role="alert">
+      <i class="bi bi-bell-fill me-3" style="font-size: 1.5rem;"></i>
+      <div>
+        {% for message in messages %}
+          <div class="mb-1">{{ message|safe }}</div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="row">
+   
+  </div>
+</div>
+
+{% if messages %}
+  <div class="border rounded p-3 mb-4 bg-light">
+    {% for message in messages %}
+      <p style="color: green; margin: 0;">{{ message|safe }}</p>
+    {% endfor %}
+  </div>
+{% endif %}
+
+-->
+<!--
+{% for item in truyen_theo_doi %}
+    {% with chuong_moi=item.id_truyen.chuong_truyen.last %}
+        {% if chuong_moi  %}
+            <p >
+                <a href="{{ chuong_moi.get_absolute_url }}" style="color:green; font-weight: bold; text-decoration: none">
+                    
+                    
+                Truyện "{{ item.id_truyen.ten_truyen }}" có chương mới: {{ chuong_moi.ten_chuong }}
+</a>
+
+            </p>
+        {% endif %}
+    {% endwith %}
+{% endfor %}
+
+<div class="container mt-4">
+    <div class="row">
+        {% for item in truyen_theo_doi %}
+            {% with chuong_moi=item.id_truyen.chuong_truyen.last %}
+                {% if chuong_moi %} 
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title" style="color: green; font-weight: bold;">Truyện "{{ item.id_truyen.ten_truyen }}"</h5>
+                                <p class="card-text">Có chương mới: <strong>{{ chuong_moi.ten_chuong }}</strong></p>
+                                <a href="{{ chuong_moi.get_absolute_url }}" class="btn btn-primary">Đọc ngay</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endwith %}
+        {% endfor %}
+    </div>
+</div>
+
+<div class="container mt-4">
+  {% if messages %}
+    <div class="border rounded p-4 mb-4 bg-light shadow">
+      {% for message in messages %}
+        <p class="message-text">{{ message|safe }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="row story-cards">
+    
+  </div>
+</div>
+-->
+<!--
+<style>
+.border {
+  border-radius: 10px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.message-text {
+  color: #2c7b2b;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.story-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+}
+</style>
+-->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<!--
+<h2>Truyện bạn đang theo dõi</h2>
+<ul>
+  {% for item in truyen_theo_doi %}
+    <li>{{ item.id_truyen.ten_truyen }}</li>
+  {% endfor %}
+</ul>
+
+
+{% if messages %}
+  {% for message in messages %}
+    <p style="color:green">{{ message }}</p>
+  {% endfor %}
+{% endif %}
+-->
+
+<!--
+def trang_ca_nhan(request):
+    truyen_theo_doi = TruyenYeuThich.objects.filter(id_nguoi_dung=request.user.thong_tin_nguoi_dung)
+
+    for item in truyen_theo_doi:  # and not da_xem_chuong(request.user, chuong_moi)
+        chuong_moi = item.id_truyen.chuong_truyen.order_by('-thu_tu').first()  # Lấy chương mới nhất của truyện
+        if chuong_moi:
+            messages.info(
+    request,
+    format_html(
+        'Truyện <strong>{}</strong> vừa có chương mới: <a href="{}">{}</a>',
+        item.id_truyen.ten_truyen,
+        chuong_moi.get_absolute_url(),
+        chuong_moi.ten_chuong
+    )
+) 
+            # messages.info(request, f'Truyện "{item.id_truyen.ten_truyen}" vừa có chương mới: {chuong_moi.ten_chuong}')
+
+    return render(request, 'reader/truyen_theo_doi.html', {'truyen_theo_doi': truyen_theo_doi})
+-->

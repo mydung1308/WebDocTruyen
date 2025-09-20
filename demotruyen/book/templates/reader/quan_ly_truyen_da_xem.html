@@ -1,0 +1,127 @@
+{% extends 'reader/home.html' %}
+
+{% block content %}
+
+{% load static %}
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f9fafb;
+            margin: 0;
+            color: #333;
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 2.5rem;
+        }
+        ul.truyen-list {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 0;
+            list-style: none;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            background-color: #ffffff;
+        }
+        ul.truyen-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            border-bottom: 1px solid #e3e6e8;
+            transition: background-color 0.3s ease;
+        }
+        ul.truyen-list li:last-child {
+            border-bottom: none;
+        }
+        ul.truyen-list li:hover {
+            background-color: #ecf0f3;
+        }
+        ul.truyen-list li a {
+            color: #2980b9;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 1.15rem;
+        }
+        ul.truyen-list li a:hover {
+            text-decoration: underline;
+        }
+        span.chuong-doc {
+            background: #3498db;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(52,152,219,0.3);
+            user-select: none;
+        }
+        p.no-data {
+            max-width: 700px;
+            margin: 40px auto;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        @media screen and (max-width: 600px) {
+            ul.truyen-list li {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                padding: 15px 20px;
+            }
+            span.chuong-doc {
+                align-self: flex-start;
+            }
+        }
+    </style>
+
+    <h2>Các Truyện Đã Xem </h2>
+    {% if truyen_da_doc %}
+        <ul class="truyen-list">
+        {% for item in truyen_da_doc %}
+            <li>
+
+                <a href="{{ item.truyen.get_absolute_url }}">{{ item.truyen.ten_truyen }}</a>
+                
+                <span class="chuong-doc">
+                    Đã đọc {{ item.so_chuong_da_doc|default:"0" }} / {{ item.so_chuong_tong }} chương
+                </span>
+                <!--
+                {% if item.so_chuong_da_doc %}
+                <span class="chuong-doc">Đã đọc {{ item.so_chuong_da_doc }} chương</span>
+                {% endif %}
+                -->
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-data">Bạn chưa đọc truyện nào.</p>
+    {% endif %}
+
+
+{% endblock %}
+
+<!--
+ <h2>Danh sách truyện bạn đã xem</h2>
+  {% if truyens %}
+    <ul>
+      {% for item in truyens %}
+        <li>
+            
+          <a href="{{ item.truyen.get_absolute_url }}">{{ item.truyen.ten_truyen }}</a>
+          {% if item.so_chuong_da_doc %}
+            - Đã đọc {{ item.so_chuong_da_doc }} chương
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Bạn chưa xem truyện nào.</p>
+  {% endif %}
+-->

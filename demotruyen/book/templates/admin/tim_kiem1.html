@@ -1,0 +1,119 @@
+{% extends 'admin/home.html' %}
+
+{% block content %}
+<div class="container mt-4" style="margin-top: 75px;">
+    <div class="row" style="margin-top: 75px;">
+        <!-- Cột lọc truyện -->
+        <div class="col-md">
+            <div class="card shadow-sm p-3">
+                <h5 class="mb-3">🔍 Bộ Lọc</h5>
+                <form action="{% url 'admin-timkiemtruyen' %}" method="GET">
+                    
+                    
+                    <!-- Ô tìm kiếm -->
+                    <div class="mb-3">
+                        <input type="text" name="q" class="form-control" placeholder="Nhập tên truyện..." value="{{ query }}" required>
+                    </div>
+                  
+                    
+                    <!-- Lọc theo số chương -->
+                    <div class="mb-3">
+                        <label class="form-label">📖 Số chương:</label>
+                        <select class="form-select" name="so_chuong">
+                            <option value="">Tất cả</option>
+                            <option value="0-10">Dưới 10</option>
+                            <option value="11-50">11 - 50</option>
+                            <option value="51-100">50 - 100</option>
+                            <option value="101-999999">Trên 100</option>
+                        </select>
+                    </div>
+
+                    <!-- Lọc theo trạng thái -->
+                    <div class="mb-3">
+                        <label class="form-label">⚡ Trạng thái:</label>
+                        <select class="form-select" name="trang_thai">
+                            <option value="">Tất cả</option>
+                            <option value="hoan_thanh">Hoàn thành</option>
+                            <option value="dang_ra">Đang ra</option>
+                        </select>
+                    </div>
+                    
+
+                    <!-- Lọc theo thể loại -->
+                    <div class="mb-3">
+                        <label class="form-label">🎭 Thể loại:</label>
+                        <div class="d-flex flex-wrap ">
+                            {% for theloai in ds_the_loai %}
+                        
+                            <div class="form-check me-3">
+                                <input class="form-check-input" type="checkbox" name="the_loai" value="{{ theloai.ten_the_loai }}" id="tl{{ theloai.id }}"
+                                {% if theloai.ten_the_loai in the_loai_id %} checked {% endif %}>
+                                <label class="form-check-label" for="tl{{ theloai.id }}">{{ theloai.ten_the_loai }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Sắp xếp -->
+                    <div class="mb-3">
+                        <label class="form-label">📅 Sắp xếp theo:</label>
+                        <select class="form-select" name="sap_xep">
+                            <option value="newest">Mới nhất</option>
+                            <option value="oldest">Cũ nhất</option>
+                        </select>
+                    </div>
+                    
+
+                    <!-- Nút tìm kiếm  --> 
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </button>
+                </form>
+            
+        </div>
+    </div>
+
+        
+
+    <!-- Cột hiển thị kết quả -->
+    <div class="container mt-4">
+        <h2 class="text-center text-primary fw-bold">🔍 Kết quả tìm kiếm cho: "{{ query }}"</h2>
+        <!-- <p class="text-center text-secondary">Tổng số kết quả: <strong>{{ tong_so_ket_qua }}</strong></p> -->
+        <h2 class="text-center text-secondary mb-4">Kết quả tìm kiếm <strong> ({{ tong_so_ket_qua }})</strong></h2>
+        
+        <div class="row">
+            {% for truyen in ket_qua %}
+            
+            <div class="col-6 col-md-4 col-lg-3 mb-4" >
+                 <!-- Bọc toàn bộ card trong thẻ <a> -->
+                <a href="{% url 'admin-chitiettruyen' truyen.id %}" class="text-decoration-none">
+                
+                 <!-- Điều chỉnh số cột theo kích thước màn hình -->
+                <div class="card truyen-card h-100">
+                    
+                    <div class="position-relative">
+                        
+                        <img src="{{ truyen.anh_dai_dien.url }}" class="truyen-img card-img-top" alt="{{ truyen.ten_truyen }}">
+                        
+                        {% if truyen.trang_thai == 'Full' %}
+                        <span class="badge bg-danger position-absolute top-0 end-0">FULL</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <h6 class="card-title text-truncate">{{ truyen.ten_truyen }}</h6>
+                        <p class="text-muted mt-3 mb-1 small">📖 Chương: {{ truyen.so_luong_chuong }}</p>
+                        <p class="text-muted small">📅 Cập nhật: {{ truyen.ngay_cap_nhat|date:"d/m/Y" }}</p>
+                    </div>
+                </div>
+                </a>
+            </div>
+                {% empty %}
+                <p>Không có truyện nào 😢.</p>
+                {% endfor %}
+                
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

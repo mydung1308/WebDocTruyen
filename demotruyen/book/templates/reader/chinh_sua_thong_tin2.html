@@ -1,0 +1,57 @@
+{% extends 'reader/home.html' %}
+
+{% block content %}
+
+
+<div class="container mt-4">
+    <!-- Hiển thị thông báo -->
+    {% if messages %}
+        <div class="mt-3">
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <h2>Chỉnh sửa thông tin cá nhân</h2>
+    <form action="{% url 'reader-sua-thongtincanhan' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">Tên đăng nhập</label>
+            {{ form.username }}
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Họ</label>
+            {{ form.first_name }}
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Tên</label>
+            {{ form.last_name }}
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Tên hiển thị</label>
+            {{ form.ten_hien_thi }}
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            {{ form.email }}
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Giới tính</label>
+            {{ form.gioi_tinh }}
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Ảnh đại diện</label><br>
+            {% if thong_tin.anh_dai_dien %}
+                <img src="{{ thong_tin.anh_dai_dien.url }}" width="100"><br>
+                <input type="checkbox" name="xoa_anh"> Xóa ảnh
+            {% endif %}
+            {{ form.anh_dai_dien }}
+        </div>
+        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+    </form>
+</div>
+{% endblock %}

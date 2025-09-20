@@ -1,0 +1,144 @@
+{% extends 'giaodienchung/index.html' %}
+{% block content %}
+<div class="container mt-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'chitiettruyen' truyen.id %}">{{ truyen.ten_truyen }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ chuong.ten_chuong }}</li>
+        </ol>
+    </nav>
+
+    <!-- Tiêu đề chương -->
+    <h2 class="text-center">{{ chuong.ten_chuong }}</h2>
+    <p class="text-muted text-center">Cập nhật: Đăng nhập để đánh dấu chương {{ chuong.created_at|date:"d/m/Y H:i" }}</p>
+
+    <!-- Nội dung chương -->
+    <div class="content p-3">
+        <p>{{ chuong.noi_dung_chuong|linebreaks }}</p> <!-- linebreaks: Hiển thị dòng mới -->
+    </div>
+
+    <!-- Nút Audio -->
+    <div class="text-center mt-3">
+        <button id="btnAudio" class="btn btn-danger">
+            <i class="fas fa-volume-up"></i> Nghe truyện
+        </button>
+    </div>
+
+    <!-- Điều hướng chương -->
+    <div class="d-flex justify-content-between mt-4">
+        {% if chuong_truoc %}
+            <a href="{% url 'doc_chuong' truyen.id chuong_truoc.thu_tu %}" class="btn btn-primary btn-lg px-4 py-2">
+                <i class="bi bi-arrow-left fs-4"></i> 
+            </a>
+        {% else %}
+            <button class="btn btn-secondary btn-lg px-4 py-2" disabled><i class="bi bi-arrow-right fs-4"></i> </button>
+        {% endif %}
+
+                    <!-- Chọn chương -->
+    <div class="text-center mt-3">
+        <label for="select-chuong" class="fw-bold"></label>
+            <select id="select-chuong" class="form-select w-auto d-inline-block">
+                {% for c in danh_sach_chuong %}
+                    <option value="{% url 'doc_chuong' truyen.id c.thu_tu %}" {% if c.thu_tu == chuong.thu_tu %}selected{% endif %}>
+                    Chương {{ c.thu_tu }}
+                    </option>
+                {% endfor %}
+            </select>
+    </div>
+
+        {% if chuong_sau %}
+            <a href="{% url 'doc_chuong' truyen.id chuong_sau.thu_tu %}" class="btn btn-primary btn-lg px-4 py-2">
+                    <i class="bi bi-arrow-right fs-4"></i>
+            </a>
+        {% else %}
+            <button class="btn btn-secondary btn-lg px-4 py-2" disabled><i class="bi bi-arrow-left fs-4"></i></button>
+        {% endif %}
+    </div>
+</div>
+
+
+<script>
+    document.getElementById('select-chuong').addEventListener('change', function() {
+        window.location.href = this.value;
+    });
+</script>
+
+<script>
+    document.getElementById('select-chuong').addEventListener('change', function() {
+        window.location.href = this.value;
+    });
+    if (!('speechSynthesis' in window)) {
+        alert("Trình duyệt của bạn không hỗ trợ tính năng nghe truyện bằng giọng nói.");
+    }
+    const btnAudio = document.getElementById("btnAudio");
+    let synthesis = window.speechSynthesis;
+    let utterance;
+    let isSpeaking = false;
+    btnAudio.addEventListener("click", () => {
+        let text = document.querySelector('.content').textContent.trim();
+        if (!text) {
+            alert("Nội dung truyện đang trống.");
+            return;
+        }
+        if (synthesis.speaking) {
+            synthesis.cancel();
+            btnAudio.innerHTML = '<i class="fas fa-volume-up"></i> Nghe truyện';
+            isSpeaking = false;
+            return;
+        }
+
+        utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'vi-VN';
+        utterance.rate = 1;
+        utterance.pitch = 1;
+        utterance.onstart = () => {
+            isSpeaking = true;
+            btnAudio.innerHTML = '<i class="fas fa-stop"></i> Dừng nghe';
+        };
+        utterance.onend = () => {
+            isSpeaking = false;
+            btnAudio.innerHTML = '<i class="fas fa-volume-up"></i> Nghe truyện';
+        };
+
+        utterance.onerror = () => {
+            isSpeaking = false;
+            btnAudio.innerHTML = '<i class="fas fa-volume-up"></i> Nghe truyện';
+            alert("Có lỗi xảy ra khi phát âm thanh.");
+        };
+        synthesis.speak(utterance);
+    });
+</script>
+
+
+<style>
+
+    /* Căn chỉnh nội dung chương */
+    .content {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        font-size: 19px;
+        line-height: 1.7;
+        text-align: justify;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        color: #212529; /* Màu chữ mặc định cho chế độ sáng */
+        transition: background 0.3s, color 0.3s;
+    }
+
+    /* Nếu chế độ tối được bật */
+    body.dark-mode .content {
+        background: #1e1e1e !important; /* Màu nền tối */
+        color: #f1f1f1 !important; /* Màu chữ sáng */
+    }
+
+    .dark-mode .breadcrumb-item {
+        color: #fff !important; /* Đổi màu chữ sang trắng */
+    }
+    
+
+
+</style>
+{% endblock %}

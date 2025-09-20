@@ -1,0 +1,138 @@
+{% extends 'giaodienchung/index.html' %}
+
+{% block giaodienchung %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truyện mới cập nhật</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .card.truyen-card {
+            height: 100%; /* Giữ chiều cao đồng nhất */
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card.truyen-card .card-body {
+            flex-grow: 1; /* Tự động co giãn */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .card.truyen-card img {
+            height: 280px; /* Đặt chiều cao cố định cho ảnh */
+            object-fit: cover; /* Cắt ảnh để vừa khung */
+        }
+        
+        .card-body .card-title {
+            font-size: 29 px;
+            font-weight: bold;
+            text-align: left;
+            white-space: normal; /* Cho phép xuống dòng */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Giới hạn tối đa 2 dòng */
+            -webkit-box-orient: vertical;
+            line-height: 1.4; /* Tăng line-height để chữ không bị cắt */
+            margin-bottom: 3;
+        }
+        .card-body p {
+            font-size: 14px; /* Mặc định cho desktop */
+        }
+        
+        /* Chỉnh nhỏ hơn trên điện thoại */
+        @media (max-width: 768px) {
+            .card-title {
+                font-size: 18px; /* Giảm kích thước chữ trên điện thoại */
+                -webkit-line-clamp: 3 ; /* Giới hạn hiển thị tối đa 2 dòng */
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: normal;
+                margin-bottom:5 ;
+            }
+
+            .card.truyen-card img {
+                height: 200px; /* Đặt chiều cao cố định cho ảnh */
+                object-fit: cover; /* Cắt ảnh để vừa khung */
+            }
+        
+            .card-body p {
+                font-size: 12px; /* Chương & ngày nhỏ hơn trên điện thoại */
+            }
+        }
+        
+        
+        
+    </style>
+</head>
+<body>
+
+<div class="container mt-4">
+    <h2 class="mb-4">TRUYỆN MỚI CẬP NHẬT</h2>
+    
+    <div class="row">
+        {% for truyen in page_obj %}
+        <div class="col-6 col-md-4 col-lg-3 mb-4"> <!-- Điều chỉnh số cột theo kích thước màn hình -->
+            <div class="card truyen-card h-100">
+                <div class="position-relative">
+                    <img src="{{ truyen.anh_dai_dien.url }}" class="truyen-img card-img-top" alt="{{ truyen.ten_truyen }}">
+                    {% if truyen.trang_thai == 'Full' %}
+                    <span class="badge bg-danger position-absolute top-0 end-0">FULL</span>
+                    {% endif %}
+                </div>
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <h6 class="card-title text-truncate ">{{ truyen.ten_truyen }}</h6>
+                    <p class="text-muted mt-3 mb-1 small">Chương: {{ truyen.so_luong_chuong }}</p>
+                    <p class="text-muted small">Cập nhật: {{ truyen.ngay_cap_nhat|timesince }} trước</p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>Không có truyện nào.</p>
+        {% endfor %}
+    </div>
+    
+
+    <!-- Phân trang -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">&laquo;</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">‹</a>
+                </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">›</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">&raquo;</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+{% endblock %}

@@ -1,0 +1,111 @@
+
+
+{% extends 'reader/home.html' %}
+
+{% block content %}
+
+<style>
+  .truyen-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .card {
+    background: linear-gradient(to bottom right, #fdfbfb, #ebedee);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+  }
+
+  .card h3 {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 10px;
+  }
+
+  .card p {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 12px;
+  }
+
+  .card a {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #4f46e5;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+
+  .card a:hover {
+    background-color: #4338ca;
+  }
+
+  .error {
+    color: red;
+    padding: 10px;
+    background-color: #ffeaea;
+    border-radius: 8px;
+    margin: 10px 0;
+  }
+</style>
+
+<div class="truyen-list">
+  {% for item in truyen_theo_doi %}
+    {% if item.truyen_id_custom %}
+      <div class="card">
+        <h3>{{ item.ten_truyen }}</h3>
+        <p>Đã đọc: {{ item.so_chuong_dadoc }} chương / {{ item.tong_so_chuong }}</p>
+
+        {% if item.chuong_moi_nhat %}
+          <a href="{% url 'reader-docchuong' truyen_id=item.truyen_id_custom thu_tu=item.chuong_moi_nhat %}">
+            Tiếp tục đọc chương {{ item.chuong_moi_nhat }}
+          </a>
+        {% else %}
+          <a href="{% url 'reader-docchuong' truyen_id=item.truyen_id_custom thu_tu=1 %}">
+            Bắt đầu đọc từ chương 1
+          </a>
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="error">⚠️ Lỗi: thiếu ID truyện!</div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+
+{% endblock %}
+
+
+<!--
+{% for item in truyen_theo_doi %}
+  {% if item.truyen_id_custom %}
+    <div class="card">
+      <h3>{{ item.ten_truyen }}</h3>
+      <p>Đã đọc: {{ item.so_chuong_dadoc }} chương / {{ item.tong_so_chuong }}</p>
+
+      {% if item.chuong_moi_nhat %}
+        <a href="{% url 'reader-docchuong' truyen_id=item.truyen_id_custom thu_tu=item.chuong_moi_nhat %}">
+          Tiếp tục đọc chương {{ item.chuong_moi_nhat }}
+        </a>
+      {% else %}
+        <a href="{% url 'reader-docchuong' truyen_id=item.truyen_id_custom thu_tu=1 %}">
+          Bắt đầu đọc từ chương 1
+        </a>
+      {% endif %}
+    </div>
+  {% else %}
+    <p>Lỗi: thiếu ID truyện!</p>
+  {% endif %}
+{% endfor %}
+-->
